@@ -16,11 +16,17 @@ def learning(data_path):
     f_data = pd.read_table(data_path, sep=',')
     f_data = f_data.dropna()
     model = Sequential()
-    model.add(Dense(25, input_dim=5, activation='relu'))
-    model.add(Dense(20, activation='relu'))
-    model.add(Dense(15, activation='relu'))
-    model.add(Dense(5, activation='relu'))
+    model.add(Dense(24, input_dim=8, activation='relu'))
+    model.add(Dense(16, activation='relu'))
+    model.add(Dense(8, activation='relu'))
     model.add(Dense(1))
+
+    # model.add(Dense(24, input_dim=8, activation='sigmoid'))
+    # model.add(Dense(16, activation='sigmoid'))
+    # model.add(Dense(8, activation='sigmoid'))
+    # model.add(Dense(1))
+
+
     model.compile(loss='mean_squared_error', optimizer='adam')
     validation_size = 0.30
     seed = 0
