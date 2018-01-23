@@ -16,7 +16,7 @@ def learning(data_path):
     f_data = pd.read_table(data_path, sep=',')
     f_data = f_data.dropna()
     model = Sequential()
-    model.add(Dense(24, input_dim=8, activation='relu'))
+    model.add(Dense(24, input_dim=10, activation='relu'))
     model.add(Dense(16, activation='relu'))
     model.add(Dense(8, activation='relu'))
     model.add(Dense(1))
@@ -30,7 +30,9 @@ def learning(data_path):
     model.compile(loss='mean_squared_error', optimizer='adam')
     validation_size = 0.30
     seed = 0
-    X = f_data[['pct5_macd_5', 'pct5_macdsignal_5', 'pct5_macdhist_5', 'd5_rsi', 'pct5_vol', 'pct5_macd_20', 'pct5_macdsignal_20', 'pct5_macdhist_20']].as_matrix()
+    # X = f_data[['pct5_macd_5', 'pct5_macdsignal_5', 'pct5_macdhist_5', 'd5_rsi', 'pct5_vol', 'pct5_macd_20', 'pct5_macdsignal_20', 'pct5_macdhist_20', 'b_upper','b_lower']].as_matrix()
+    X = f_data[['pct5_macd_5', 'pct5_macdsignal_5', 'pct5_macdhist_5', 'd5_rsi', 'pct5_vol', 'pct5_macd_20',
+                'pct5_macdsignal_20', 'pct5_macdhist_20', 'b_upper', 'b_lower']].as_matrix()
     Y = f_data['pct5_sma_5'].as_matrix()
     # X = f_data[['d_macd', 'd_macdsignal', 'd_macdhist', 'd_rsi']]
     # Y = f_data['d_price']
