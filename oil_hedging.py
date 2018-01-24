@@ -5,7 +5,7 @@ from sklearn import model_selection
 from keras.models import Sequential
 from keras.layers import Dense
 import matplotlib.pyplot as plt
-
+import keras
 
 def learning(data_path):
     '''
@@ -37,9 +37,11 @@ def learning(data_path):
     # X = f_data[['d_macd', 'd_macdsignal', 'd_macdhist', 'd_rsi']]
     # Y = f_data['d_price']
 
+
     X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
     # print(X_train)
-    model.fit(X_train, Y_train, epochs=2000, batch_size=50)
+    tb_hist = keras.callbacks.TensorBoard(log_dir='./graph', histogram_freq=0, write_graph=True, write_images=True)
+    model.fit(X_train, Y_train, epochs=2000, batch_size=50, callbacks=[tb_hist])
     Y_prediction = model.predict(X_validation).flatten()
     for pre, val in zip(Y_prediction, Y_validation):
         print('predicted price= {:.3f}, real price = {:.3f}, diff ={:.3f}'.format(pre, val, pre-val))
