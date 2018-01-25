@@ -27,7 +27,7 @@ def learning(data_path):
     # model.add(Dense(1))
 
 
-    model.compile(loss='mean_squared_error', optimizer='adam')
+    model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
     valid_size = 0.20
     test_size = 0.20
     seed = 0
@@ -38,15 +38,44 @@ def learning(data_path):
     # X = f_data[['d_macd', 'd_macdsignal', 'd_macdhist', 'd_rsi']]
     # Y = f_data['d_price']
 
-
     X_train, X_test, Y_train, Y_test = model_selection.train_test_split(X, Y, test_size=test_size, random_state=seed)
-    X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X_train, Y_train, test_size=test_size, random_state=seed)
-    # print(X_train)
+    X_train, X_valid, Y_train, Y_valid = model_selection.train_test_split(X_train, Y_train, test_size=valid_size, random_state=seed)
+
     tb_hist = keras.callbacks.TensorBoard(log_dir='./graph', histogram_freq=0, write_graph=True, write_images=True)
-    history = model.fit(X_train, Y_train, epochs=2000, batch_size=50, callbacks=[tb_hist])
-    model.evaluate()
-    Y_prediction = model.predict(X_validation).flatten()
-    for pre, val in zip(Y_prediction, Y_validation):
+    from keras.callbacks import EarlyStopping
+    early_stopping = EarlyStopping(patience=20)  # 조기종료 콜백함수 정의
+    hist = model.fit(X_train, Y_train, epochs=300, batch_size=50, validation_data=(X_valid, Y_valid), callbacks=[tb_hist, early_stopping])
+
+    # 5. 모델 학습 과정 표시하기
+
+    fig, loss_ax = plt.subplots()
+
+    acc_ax = loss_ax.twinx()
+
+    loss_ax.plot(hist.history['loss'], 'y', label='train loss')
+    loss_ax.plot(hist.history['val_loss'], 'r', label='val loss')
+
+    acc_ax.plot(hist.history['acc'], 'b', label='train acc')
+    acc_ax.plot(hist.history['val_acc'], 'g', label='val acc')
+
+    loss_ax.set_xlabel('epoch')
+    loss_ax.set_ylabel('loss')
+    acc_ax.set_ylabel('accuray')
+
+    loss_ax.legend(loc='upper left')
+    acc_ax.legend(loc='lower left')
+
+    plt.show()
+
+    loss_and_metrics = model.evaluate(X_test, Y_test, batch_size=50)
+    print('')
+    print('loss_and_metrics : ' + str(loss_and_metrics))
+
+    # 6. 모델 저장하기
+    from keras.models import load_model
+    model.save('c:\\ml_test\\mnist_mlp_model.h5')
+    Y_prediction = model.predict(X_test).flatten()
+    for pre, val in zip(Y_prediction, Y_test):
         print('predicted price= {:.3f}, real price = {:.3f}, diff ={:.3f}'.format(pre, val, pre-val))
 
     # print(X)
@@ -74,4 +103,4 @@ def learning(data_path):
     # plt.show()
 
 
-learning('c:\\fine_oil_price.txt')
+learning('c:\\ml_test\\fine_oil_price.txt')
