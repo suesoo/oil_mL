@@ -28,7 +28,8 @@ def learning(data_path):
 
 
     model.compile(loss='mean_squared_error', optimizer='adam')
-    validation_size = 0.30
+    valid_size = 0.20
+    test_size = 0.20
     seed = 0
     # X = f_data[['pct5_macd_5', 'pct5_macdsignal_5', 'pct5_macdhist_5', 'd5_rsi', 'pct5_vol', 'pct5_macd_20', 'pct5_macdsignal_20', 'pct5_macdhist_20', 'b_upper','b_lower']].as_matrix()
     X = f_data[['pct5_macd_5', 'pct5_macdsignal_5', 'pct5_macdhist_5', 'd5_rsi', 'pct5_vol', 'pct5_macd_20',
@@ -38,10 +39,12 @@ def learning(data_path):
     # Y = f_data['d_price']
 
 
-    X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
+    X_train, X_test, Y_train, Y_test = model_selection.train_test_split(X, Y, test_size=test_size, random_state=seed)
+    X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X_train, Y_train, test_size=test_size, random_state=seed)
     # print(X_train)
     tb_hist = keras.callbacks.TensorBoard(log_dir='./graph', histogram_freq=0, write_graph=True, write_images=True)
-    model.fit(X_train, Y_train, epochs=2000, batch_size=50, callbacks=[tb_hist])
+    history = model.fit(X_train, Y_train, epochs=2000, batch_size=50, callbacks=[tb_hist])
+    model.evaluate()
     Y_prediction = model.predict(X_validation).flatten()
     for pre, val in zip(Y_prediction, Y_validation):
         print('predicted price= {:.3f}, real price = {:.3f}, diff ={:.3f}'.format(pre, val, pre-val))
