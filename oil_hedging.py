@@ -44,8 +44,9 @@ def learning(data_path):
     tb_hist = keras.callbacks.TensorBoard(log_dir='./graph', histogram_freq=0, write_graph=True, write_images=True)
     from keras.callbacks import EarlyStopping
     early_stopping = EarlyStopping(patience=20)  # 조기종료 콜백함수 정의
-    hist = model.fit(X_train, Y_train, epochs=300, batch_size=50, validation_data=(X_valid, Y_valid), callbacks=[tb_hist, early_stopping])
-
+    hist = model.fit(X_train, Y_train, epochs=2000, batch_size=50, validation_data=(X_valid, Y_valid), callbacks=[tb_hist, early_stopping])
+    # hist = model.fit(X_train, Y_train, epochs=2000, batch_size=50, validation_data=(X_valid, Y_valid),
+    #                  callbacks=[tb_hist])
     # 5. 모델 학습 과정 표시하기
 
     fig, loss_ax = plt.subplots()
@@ -73,7 +74,7 @@ def learning(data_path):
 
     # 6. 모델 저장하기
     from keras.models import load_model
-    model.save('c:\\ml_test\\mnist_mlp_model.h5')
+    model.save('c:\\ml_test\\oil_weekly_model.h5')
     Y_prediction = model.predict(X_test).flatten()
     for pre, val in zip(Y_prediction, Y_test):
         print('predicted price= {:.3f}, real price = {:.3f}, diff ={:.3f}'.format(pre, val, pre-val))
