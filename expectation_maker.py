@@ -23,11 +23,13 @@ from keras.models import load_model
 model = load_model('c:\\ml_test\\oil_weekly_model.h5')
 
 # 3. 모델 사용하기
-yhat = model.predict_classes(xhat)
+yhat = model.predict(xhat).flatten()
 f_data['y_fcst'] = yhat
-print(f_data['y_fcst'])
+f_data['model_price'] = f_data['sma_5'] * (1+yhat/100)
+f_data['real_price'] = f_data['sma_5'] * (1+f_data['pct5_sma_5']/100)
+f_data['model_price']
 # for i in range(5):
 #     print('True : ' + str(argmax(y_test[xhat_idx[i]])) + ', Predict : ' + str(yhat[i]))
 
-f_data.plot(x='date', y=['pct5_price','y_fcst'], kind='line')
+f_data.plot(x='date', y=['model_price','real_price'], kind='line')
 plt.show()

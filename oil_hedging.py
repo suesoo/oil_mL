@@ -21,19 +21,25 @@ def learning(data_path):
     model.add(Dense(8, activation='relu'))
     model.add(Dense(1))
 
-    # model.add(Dense(24, input_dim=8, activation='sigmoid'))
+    # model.add(Dense(24, input_dim=10, activation='sigmoid'))
     # model.add(Dense(16, activation='sigmoid'))
     # model.add(Dense(8, activation='sigmoid'))
     # model.add(Dense(1))
 
 
     model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
+
     valid_size = 0.20
     test_size = 0.20
     seed = 0
     # X = f_data[['pct5_macd_5', 'pct5_macdsignal_5', 'pct5_macdhist_5', 'd5_rsi', 'pct5_vol', 'pct5_macd_20', 'pct5_macdsignal_20', 'pct5_macdhist_20', 'b_upper','b_lower']].as_matrix()
     X = f_data[['pct5_macd_5', 'pct5_macdsignal_5', 'pct5_macdhist_5', 'd5_rsi', 'pct5_vol', 'pct5_macd_20',
-                'pct5_macdsignal_20', 'pct5_macdhist_20', 'b_upper', 'b_lower']].as_matrix()
+                'pct5_macdsignal_20', 'pct5_macdhist_20','b_upper', 'b_lower']].as_matrix()
+
+    # X = f_data[['pct5_macd_5', 'pct5_macdsignal_5', 'pct5_macdhist_5', 'd5_rsi', 'pct5_vol', 'pct5_macd_20',
+    #             'pct5_macdsignal_20', 'pct5_macdhist_20', 'b_upper', 'b_lower','pct5_dollar_idx']].as_matrix()
+    # X = f_data[['pct5_macd_5', 'pct5_macdsignal_5', 'pct5_macdhist_5', 'd5_rsi', 'pct5_vol', 'pct5_macd_20',
+    #             'pct5_macdsignal_20', 'pct5_macdhist_20']].as_matrix()
     Y = f_data['pct5_sma_5'].as_matrix()
     # X = f_data[['d_macd', 'd_macdsignal', 'd_macdhist', 'd_rsi']]
     # Y = f_data['d_price']
@@ -43,8 +49,8 @@ def learning(data_path):
 
     tb_hist = keras.callbacks.TensorBoard(log_dir='./graph', histogram_freq=0, write_graph=True, write_images=True)
     from keras.callbacks import EarlyStopping
-    early_stopping = EarlyStopping(patience=20)  # 조기종료 콜백함수 정의
-    hist = model.fit(X_train, Y_train, epochs=2000, batch_size=50, validation_data=(X_valid, Y_valid), callbacks=[tb_hist, early_stopping])
+    early_stopping = EarlyStopping(patience=30)  # 조기종료 콜백함수 정의
+    hist = model.fit(X_train, Y_train, epochs=2000, batch_size=25, validation_data=(X_valid, Y_valid), callbacks=[tb_hist, early_stopping])
     # hist = model.fit(X_train, Y_train, epochs=2000, batch_size=50, validation_data=(X_valid, Y_valid),
     #                  callbacks=[tb_hist])
     # 5. 모델 학습 과정 표시하기
@@ -76,9 +82,14 @@ def learning(data_path):
     from keras.models import load_model
     model.save('c:\\ml_test\\oil_weekly_model.h5')
     Y_prediction = model.predict(X_test).flatten()
+    correct_sign=0
+    total_sample = 0
     for pre, val in zip(Y_prediction, Y_test):
+        total_sample += 1
+        if pre * val > 0:
+            correct_sign += 1
         print('predicted price= {:.3f}, real price = {:.3f}, diff ={:.3f}'.format(pre, val, pre-val))
-
+    print('hit ratio = ',correct_sign/total_sample)
     # print(X)
     # print(Y_prediction)
     # Y_prediction.plot()
